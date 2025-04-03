@@ -2,7 +2,7 @@ use crate::lib::{
     BULLET_SPAWN_INTERVAL, Decoration, GameState, GlobalTextureAtlas, Gun,
     GunTimer, NUM_WORLD_DECORATIONS, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W,
 };
-use bevy::app::{App, Plugin, Update};
+use bevy::app::{App, Plugin};
 use bevy::math::{Vec3, vec2};
 use bevy::prelude::*;
 use rand::Rng;

@@ -80,11 +80,11 @@ fn update_gun_transform(
     let offset = 60.0;
     gun_transform.translation = player_pos + vec3(offset * angle.cos(), offset * angle.sin(), 0.0);
 }
-fn update_bullet(mut bullet_query: Query<(&mut Transform, &mut Bullet, &BulletDirection)>) {
+fn update_bullet(mut bullet_query: Query<(&mut Transform, &Bullet, &BulletDirection)>) {
     if bullet_query.is_empty() {
         return;
     }
-    for (mut transform, bulled, direction) in bullet_query.iter_mut() {
+    for (mut transform, _, direction) in bullet_query.iter_mut() {
         transform.translation += direction.0.normalize() * BULLET_SPEED;
     }
 }

@@ -2,7 +2,7 @@ use crate::lib::{CAMERA_DECAY_RATE, GameState, Player};
 use bevy::app::{App, Plugin, Update};
 use bevy::math::Vec3;
 use bevy::prelude::{
-    Camera2d, Commands, IntoSystemConfigs, OnEnter, Query, Res, StableInterpolate, Time, Transform,
+    Camera2d, Commands, IntoSystemConfigs, OnEnter, Query, Transform,
     With, Without, in_state,
 };
 use bevy_pancam::{PanCam, PanCamPlugin};
@@ -21,9 +21,8 @@ fn setup_camera(mut commands: Commands) {
 fn update_camera(
     mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
     player: Query<&Transform, (With<Player>, Without<Camera2d>)>,
-    time: Res<Time>,
 ) {
-    let Ok(mut camera) = camera.get_single_mut() else {
+    let Ok(camera) = camera.get_single_mut() else {
         return;
     };
 
@@ -40,5 +39,5 @@ fn update_camera(
     //     .translation
     //     .smooth_nudge(&direction, CAMERA_DECAY_RATE, time.delta_secs());
 
-    camera.translation.lerp(direction, CAMERA_DECAY_RATE);
+    let _ = camera.translation.lerp(direction, CAMERA_DECAY_RATE);
 }

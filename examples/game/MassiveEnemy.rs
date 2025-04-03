@@ -1,7 +1,6 @@
 mod lib;
-use bevy::prelude::*;
 use lib::*;
-use rand::Rng;
+use bevy::prelude::*;
 
 fn main() {
     App::new()
@@ -27,7 +26,6 @@ fn main() {
         .insert_resource(ClearColor(Color::srgb_u8(
             BG_COLOR.0, BG_COLOR.1, BG_COLOR.2,
         )))
-
         // systems
         .add_systems(Update, close_on_esc)
         .run();

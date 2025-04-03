@@ -1,4 +1,3 @@
-use bevy::a11y::AccessibilitySystem::Update;
 use bevy::app::{App, Plugin};
 use bevy::asset::{AssetServer, Assets, Handle};
 use bevy::image::Image;
