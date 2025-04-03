@@ -1,4 +1,4 @@
-use crate::lib::{ENEMY_SPAWN_INTERCAL, GameState, GlobalTextureAtlas, MAX_ENEMIES, NUM_ENEMIES, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, ENEMY_SPEED};
+use crate::lib::{ENEMY_SPAWN_INTERCAL, GameState, GlobalTextureAtlas, MAX_ENEMIES, NUM_ENEMIES, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, ENEMY_SPEED, AnimationTimer};
 use bevy::app::{App, Update};
 use bevy::math::{Vec3, vec2};
 use bevy::prelude::*;
@@ -7,7 +7,7 @@ use rand::Rng;
 use std::time::Duration;
 
 #[derive(Component)]
-struct Enemy;
+pub struct Enemy;
 pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
@@ -56,13 +56,14 @@ fn spawn_enemies(
                 image: handle.image.clone().unwrap(),
                 texture_atlas: Some(TextureAtlas {
                     layout: handle.layout.clone().unwrap(),
-                    index: 7,
+                    index: 14,
                 }),
                 ..default()
             },
             Transform::from_translation(vec2(x, y).extend(1.))
                 .with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
             Enemy,
+            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         ));
     }
 }

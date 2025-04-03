@@ -2,7 +2,7 @@ pub const SPRITE_SHEET_PATH: &str = "gabe-idle-run.png";
 pub const TILE_W: u32 = 24;
 pub const TILE_H: u32 = 24;
 pub const SPRITE_SHEET_W: u32 = 7;
-pub const SPRITE_SHEET_H: u32 = 2;
+pub const SPRITE_SHEET_H: u32 = 3;
 pub const WW: f32 = 1200.0;
 pub const WH: f32 = 900.0;
 
