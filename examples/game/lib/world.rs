@@ -33,7 +33,7 @@ fn init_world(
             }),
             ..default()
         },
-        Transform::from_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
+        Transform::from_translation(Vec3::new(0.0, 0.0, 2.0)).with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
         Player,
     ));
     commands.spawn((

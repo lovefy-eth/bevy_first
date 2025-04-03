@@ -22,6 +22,7 @@ fn main() {
         .add_plugins(GunPlugin)
         .add_plugins(WorldPlugin)
         .add_plugins(CameraPlugin)
+        .add_plugins(EnemyPlugin)
         .init_state::<GameState>()
         .insert_resource(ClearColor(Color::srgb_u8(
             BG_COLOR.0, BG_COLOR.1, BG_COLOR.2,

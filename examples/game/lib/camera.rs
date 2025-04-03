@@ -1,10 +1,9 @@
 use crate::lib::{CAMERA_DECAY_RATE, GameState, Player};
 use bevy::app::{App, Plugin, Update};
-use bevy::math::Vec3;
-use bevy::prelude::{
-    Camera2d, Commands, IntoSystemConfigs, OnEnter, Query, Transform,
-    With, Without, in_state,
-};
+use bevy::input::ButtonInput;
+use bevy::math::{vec3, Vec3};
+use bevy::prelude::{Camera2d, Commands, IntoSystemConfigs, OnEnter, Query, Transform, With, Without, in_state, KeyCode, Res, StableInterpolate};
+use bevy::time::Time;
 use bevy_pancam::{PanCam, PanCamPlugin};
 
 pub struct CameraPlugin;
@@ -16,13 +15,18 @@ impl Plugin for CameraPlugin {
     }
 }
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d).insert(PanCam::default());
+    commands.spawn(Camera2d).insert(PanCam {
+        grab_buttons:vec![],
+        ..Default::default()
+    });
 }
 fn update_camera(
     mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
     player: Query<&Transform, (With<Player>, Without<Camera2d>)>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    time: Res<Time>,
 ) {
-    let Ok(camera) = camera.get_single_mut() else {
+    let Ok(mut camera) = camera.get_single_mut() else {
         return;
     };
 
@@ -35,9 +39,11 @@ fn update_camera(
 
     // Applies a smooth effect to camera movement using stable interpolation
     // between the camera position and the player position on the x and y axes.
-    // camera
-    //     .translation
-    //     .smooth_nudge(&direction, CAMERA_DECAY_RATE, time.delta_secs());
-
-    let _ = camera.translation.lerp(direction, CAMERA_DECAY_RATE);
+    if keyboard_input.pressed(KeyCode::Space) {
+        camera
+            .translation
+            .smooth_nudge(&direction, CAMERA_DECAY_RATE, time.delta_secs());
+    } else {
+        camera.translation = camera.translation.lerp(vec3(x,y,0.), 0.1);
+    }
 }

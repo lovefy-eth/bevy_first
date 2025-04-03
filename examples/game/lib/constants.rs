@@ -8,7 +8,7 @@ pub const WH: f32 = 900.0;
 
 // Sprites
 pub const SPRITE_SCALE_FACTOR: f32 = 3.0;
-pub const SPRITE_SPEED: f32 = 2.0;
+pub const SPRITE_SPEED: f32 = 5.0;
 // World
 pub const NUM_WORLD_DECORATIONS: usize = 1000;
 pub const WORLD_W:f32 = 3000.;
@@ -23,3 +23,9 @@ pub const BG_COLOR: (u8, u8, u8) = (192, 204, 184);
 
 // CAMERA
 pub const CAMERA_DECAY_RATE: f32 = 2.;
+
+// Enemy
+pub const NUM_ENEMIES: usize = 100;
+pub const ENEMY_SPAWN_INTERCAL:f32 = 1.;
+pub const MAX_ENEMIES: usize = 100_000;
+pub const ENEMY_SPEED:f32 = 2.;
