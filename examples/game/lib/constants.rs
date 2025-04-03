@@ -1,0 +1,25 @@
+pub const SPRITE_SHEET_PATH: &str = "gabe-idle-run.png";
+pub const TILE_W: u32 = 24;
+pub const TILE_H: u32 = 24;
+pub const SPRITE_SHEET_W: u32 = 7;
+pub const SPRITE_SHEET_H: u32 = 2;
+pub const WW: f32 = 1200.0;
+pub const WH: f32 = 900.0;
+
+// Sprites
+pub const SPRITE_SCALE_FACTOR: f32 = 3.0;
+pub const SPRITE_SPEED: f32 = 2.0;
+// World
+pub const NUM_WORLD_DECORATIONS: usize = 1000;
+pub const WORLD_W:f32 = 3000.;
+pub const WORLD_H:f32 = 4000.;
+
+//GUN
+pub const BULLET_SPEED: f32 = 10.0;
+pub const BULLET_SPAWN_INTERVAL: f32 = 0.1;
+
+// Colors
+pub const BG_COLOR: (u8, u8, u8) = (192, 204, 184);
+
+// CAMERA
+pub const CAMERA_DECAY_RATE: f32 = 2.;
