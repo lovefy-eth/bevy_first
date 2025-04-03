@@ -1,7 +1,10 @@
 use std::f32::consts::PI;
 use bevy::input::mouse::MouseButtonInput;
-use bevy::math::vec3;
+use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
+use bevy_pancam::{PanCam, PanCamPlugin};
+use rand::Rng;
+
 // Window
 const SPRITE_SHEET_PATH: &str = "gabe-idle-run.png";
 const TILE_W: u32 = 24;
@@ -14,13 +17,20 @@ const WH: f32 = 900.0;
 // Sprites
 const SPRITE_SCALE_FACTOR: f32 = 3.0;
 const SPRITE_SPEED: f32 = 2.0;
+// World
+const NUM_WORLD_DECORATIONS: usize = 1000;
+const WORLD_W:f32 = 3000.;
+const WORLD_H:f32 = 4000.;
 
 //GUN
-const BULLET_SPEED: f32 = 2.0;
+const BULLET_SPEED: f32 = 10.0;
 const BULLET_SPAWN_INTERVAL: f32 = 0.1;
 
 // Colors
 const BG_COLOR: (u8, u8, u8) = (192, 204, 184);
+
+// CAMERA
+const CAMERA_DECAY_RATE: f32 = 2.;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 enum GameState {
@@ -51,6 +61,8 @@ struct Gun;
 struct Bullet;
 #[derive(Component)]
 struct BulletDirection(Vec3);
+#[derive(Component)]
+struct Decoration;
 
 
 fn main() {
@@ -68,6 +80,7 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(PanCamPlugin::default())
         .init_state::<GameState>()
         .insert_resource(ClearColor(Color::srgb_u8(
             BG_COLOR.0, BG_COLOR.1, BG_COLOR.2,
@@ -81,13 +94,13 @@ fn main() {
         // .add_plugins(FrameTimeDiagnosticsPlugin)
         // systems
         .add_systems(OnEnter(GameState::Loading), load_assets)
-        .add_systems(OnEnter(GameState::GameInit), (setup_camera, init_world))
+        .add_systems(OnEnter(GameState::GameInit), (setup_camera, init_world,spawn_world_decorations))
         .add_systems(
             Update,
             (
                 close_on_esc,
                 (
-                    player_input_system,
+                    (player_input_system,update_camera).chain(),
                     update_gun_transform,
                     update_gun_input,
                     update_cursor_position,
@@ -155,10 +168,57 @@ fn init_world(
     state.set(GameState::InGame);
 }
 
-fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
+fn spawn_world_decorations(mut commands: Commands,
+                           texture_atlas: Res<GlobalTextureAtlasHandle>,
+                           image_handle: Res<GlobalSpriteSheetHandle>,){
+
+
+    let mut rng = rand::rng();
+    for _ in 0..NUM_WORLD_DECORATIONS {
+        let x = rng.random_range(-WORLD_W..WORLD_W);
+        let y = rng.random_range(-WORLD_H..WORLD_H);
+        commands.spawn((
+            Sprite {
+                image: image_handle.0.clone().unwrap(),
+                texture_atlas: Some(TextureAtlas {
+                    layout: texture_atlas.0.clone().unwrap(),
+                    index: 10,
+                }),
+                ..default()
+            },
+            Transform::from_translation(vec2(x,y).extend(0.)).with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
+            Decoration,
+        ));
+    }
+
+
 }
 
+fn setup_camera(mut commands: Commands) {
+    commands.spawn(Camera2d).insert(PanCam::default());
+}
+fn update_camera(
+    mut camera: Query<&mut Transform, (With<Camera2d>, Without<Player>)>,
+    player: Query<&Transform, (With<Player>, Without<Camera2d>)>,
+    time: Res<Time>,
+) {
+    let Ok(mut camera) = camera.get_single_mut() else {
+        return;
+    };
+
+    let Ok(player) = player.get_single() else {
+        return;
+    };
+
+    let Vec3 { x, y, .. } = player.translation;
+    let direction = Vec3::new(x, y, camera.translation.z);
+
+    // Applies a smooth effect to camera movement using stable interpolation
+    // between the camera position and the player position on the x and y axes.
+    camera
+        .translation
+        .smooth_nudge(&direction, CAMERA_DECAY_RATE, time.delta_secs());
+}
 fn close_on_esc(
     mut commands: Commands,
     focused_windows: Query<(Entity, &Window)>,
@@ -215,8 +275,8 @@ fn update_bullet(
     if bullet_query.is_empty(){
         return;
     }
-    for (mut transform, mut bulled, direction) in bullet_query.iter_mut(){
-        transform.translation+=direction.0.normalize() * SPRITE_SPEED;
+    for (mut transform, bulled, direction) in bullet_query.iter_mut(){
+        transform.translation+=direction.0.normalize() * BULLET_SPEED;
     }
 }
 fn update_gun_input(
@@ -242,7 +302,7 @@ fn update_gun_input(
                 }),
                 ..default()
             },
-            Transform::from_translation(gun_pos),
+            Transform::from_translation(gun_pos).with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
             Bullet,
             BulletDirection(*gun_transform.local_y()),
         ));
