@@ -6,6 +6,7 @@ mod player;
 mod world;
 mod camera;
 mod enemy;
+mod animation;
 
 pub use constants::*;
 pub use state::*;
@@ -15,3 +16,4 @@ pub use player::*;
 pub use world::*;
 pub use camera::*;
 pub use enemy::*;
+pub use animation::*;

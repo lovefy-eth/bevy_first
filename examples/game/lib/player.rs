@@ -7,6 +7,13 @@ use crate::lib::{GameState, SPRITE_SPEED};
 #[derive(Component)]
 pub struct Player;
 
+#[derive(Component,Default)]
+pub enum PlayerState{
+    #[default]
+    Idle,
+    Moving
+}
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
@@ -16,7 +23,7 @@ impl Plugin for PlayerPlugin {
 }
 
 fn player_input_system(
-    mut player_query: Query<&mut Transform, With<Player>>,
+    mut player_query: Query<(&mut Transform,&mut PlayerState), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if player_query.is_empty() {
@@ -28,6 +35,7 @@ fn player_input_system(
     let s_key = keyboard_input.pressed(KeyCode::KeyS) || keyboard_input.pressed(KeyCode::ArrowDown);
     let d_key =
         keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight);
+    let (mut transform,mut state) = player_query.single_mut();
     if w_key || a_key || s_key || d_key || d_key {
         if w_key {
             delta.y += 1.0;
@@ -43,8 +51,10 @@ fn player_input_system(
         }
         delta = delta.normalize_or_zero();
         if delta.is_finite() {
-            let mut transform = player_query.single_mut();
             transform.translation += vec3(delta.x, delta.y, 0.0) * SPRITE_SPEED;
+            *state = PlayerState::Moving;
         }
+    } else {
+        *state = PlayerState::Idle;
     }
 }

@@ -1,7 +1,4 @@
-use crate::lib::{
-    BULLET_SPAWN_INTERVAL, Decoration, GameState, GlobalTextureAtlas, Gun,
-    GunTimer, NUM_WORLD_DECORATIONS, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W,
-};
+use crate::lib::{AnimationTimer, BULLET_SPAWN_INTERVAL, Decoration, GameState, GlobalTextureAtlas, Gun, GunTimer, NUM_WORLD_DECORATIONS, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, PlayerState};
 use bevy::app::{App, Plugin};
 use bevy::math::{Vec3, vec2};
 use bevy::prelude::*;
@@ -11,12 +8,10 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-
         app.add_systems(
             OnEnter(GameState::GameInit),
             (init_world, spawn_world_decorations),
         );
-
     }
 }
 fn init_world(
@@ -33,8 +28,11 @@ fn init_world(
             }),
             ..default()
         },
-        Transform::from_translation(Vec3::new(0.0, 0.0, 2.0)).with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
+        Transform::from_translation(Vec3::new(0.0, 0.0, 2.0))
+            .with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
         Player,
+        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+        PlayerState::default()
     ));
     commands.spawn((
         Sprite {
@@ -76,5 +74,3 @@ fn spawn_world_decorations(mut commands: Commands, handle: Res<GlobalTextureAtla
         ));
     }
 }
-
-
