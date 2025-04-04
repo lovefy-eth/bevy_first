@@ -1,7 +1,7 @@
 use crate::lib::attribute::Health;
 use crate::lib::{
     AnimationTimer, ENEMY_SPAWN_INTERCAL, ENEMY_SPEED, GameState, GlobalTextureAtlas, MAX_ENEMIES,
-    NUM_ENEMIES, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W,
+    NUM_ENEMIES, Player, RoleState, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W,
 };
 use bevy::app::{App, Update};
 use bevy::math::{Vec3, vec2};
@@ -29,20 +29,25 @@ impl Plugin for EnemyPlugin {
 }
 fn update_enemy_transform(
     player: Query<&Transform, With<Player>>,
-    mut enemy_query: Query<&mut Transform, (With<Enemy>, Without<Player>)>,
+    mut enemy_query: Query<(&mut Transform, &mut RoleState), (With<Enemy>, Without<Player>)>,
 ) {
     let Ok(player) = player.get_single() else {
         return;
     };
-    for mut enemy in enemy_query.iter_mut() {
-        let dir = (player.translation - enemy.translation).normalize();
-        enemy.translation += dir * ENEMY_SPEED;
+    for (mut enemy, mut state) in enemy_query.iter_mut() {
+        if player.translation.distance(enemy.translation).abs() < 500.0 {
+            let dir = (player.translation - enemy.translation).normalize();
+            enemy.translation += dir * ENEMY_SPEED;
+            *state = RoleState::Moving;
+        } else {
+            *state = RoleState::Idle;
+        }
     }
 }
 fn spawn_enemies(
     mut commands: Commands,
     handle: Res<GlobalTextureAtlas>,
-    player_query:Query<&Transform,With<Player>>,
+    player_query: Query<&Transform, With<Player>>,
     enemy_query: Query<&Transform, (With<Enemy>, Without<Player>)>,
 ) {
     let num_enemies = enemy_query.iter().len();
@@ -57,7 +62,7 @@ fn spawn_enemies(
         // let mut y = rng.random_range(-WORLD_H..WORLD_H);
 
         // 在玩家附近生成怪物
-        let (x,y) = get_random_position_around(player_transform.translation.truncate());
+        let (x, y) = get_random_position_around(player_transform.translation.truncate());
         commands.spawn((
             Sprite {
                 image: handle.image.clone().unwrap(),
@@ -72,6 +77,7 @@ fn spawn_enemies(
             Enemy,
             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
             Health::default(),
+            RoleState::default(),
         ));
     }
 }

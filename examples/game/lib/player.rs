@@ -2,17 +2,11 @@ use bevy::app::{App, Update};
 use bevy::input::ButtonInput;
 use bevy::math::{vec3, Vec2};
 use bevy::prelude::{in_state, Component, IntoSystemConfigs, KeyCode, Plugin, Query, Res, Transform, With};
-use crate::lib::{GameState, SPRITE_SPEED};
+use crate::lib::{GameState, RoleState, SPRITE_SPEED};
 
 #[derive(Component)]
 pub struct Player;
 
-#[derive(Component,Default)]
-pub enum PlayerState{
-    #[default]
-    Idle,
-    Moving
-}
 
 pub struct PlayerPlugin;
 
@@ -23,7 +17,7 @@ impl Plugin for PlayerPlugin {
 }
 
 fn player_input_system(
-    mut player_query: Query<(&mut Transform,&mut PlayerState), With<Player>>,
+    mut player_query: Query<(&mut Transform,&mut RoleState), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if player_query.is_empty() {
@@ -52,9 +46,9 @@ fn player_input_system(
         delta = delta.normalize_or_zero();
         if delta.is_finite() {
             transform.translation += vec3(delta.x, delta.y, 0.0) * SPRITE_SPEED;
-            *state = PlayerState::Moving;
+            *state = RoleState::Moving;
         }
     } else {
-        *state = PlayerState::Idle;
+        *state = RoleState::Idle;
     }
 }

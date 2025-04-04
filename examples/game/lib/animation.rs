@@ -1,4 +1,4 @@
-use crate::lib::{CurPosition, Enemy, GameState, Player, PlayerState};
+use crate::lib::{CurPosition, Enemy, GameState, Player, RoleState};
 use bevy::prelude::*;
 #[derive(Component)]
 pub struct AnimationTimer(pub Timer);
@@ -18,19 +18,28 @@ fn update_enemy_animation(
     time: Res<Time>,
     player_query: Query<&Transform, With<Player>>,
     mut enemy_query: Query<
-        (&mut Sprite, &Transform, &mut AnimationTimer),
+        (&mut Sprite, &Transform, &mut AnimationTimer, &RoleState),
         (With<Enemy>, Without<Player>),
     >,
 ) {
     let Ok(player_transform) = player_query.get_single() else {
         return;
     };
-    for (mut sprite, trans, mut timer) in enemy_query.iter_mut() {
+    for (mut sprite, trans, mut timer,state) in enemy_query.iter_mut() {
         sprite.flip_x = player_transform.translation.x < trans.translation.x;
         if timer.0.tick(time.delta()).just_finished() {
             if let Some(atlas) = &mut sprite.texture_atlas {
-                atlas.index = ((atlas.index - 14 + 1) % 7) + 14;
+                atlas.index  = match state {
+                    RoleState::Moving => {
+                        ((atlas.index - 14 + 1) % 7) + 14
+                    }
+                    RoleState::Idle => {
+                        14
+                    }
+                };
             }
+
+
         }
     }
 }
@@ -38,7 +47,7 @@ fn update_player_animation(
     cursor_pos: Res<CurPosition>,
     time: Res<Time>,
     mut player_query: Query<
-        (&mut Sprite, &mut AnimationTimer, &Transform, &PlayerState),
+        (&mut Sprite, &mut AnimationTimer, &Transform, &RoleState),
         With<Player>,
     >,
 ) {
@@ -55,10 +64,10 @@ fn update_player_animation(
     if animation_timer.0.tick(time.delta()).just_finished() {
         if let Some(atlas) = &mut player_sprite.texture_atlas {
             match state {
-                PlayerState::Idle => {
+                RoleState::Idle => {
                     atlas.index = 0;
                 }
-                PlayerState::Moving => {
+                RoleState::Moving => {
                     atlas.index = (atlas.index + 1) % 7;
                 }
             }

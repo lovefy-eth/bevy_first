@@ -1,4 +1,4 @@
-use crate::lib::{AnimationTimer, BULLET_SPAWN_INTERVAL, Decoration, GameState, GlobalTextureAtlas, Gun, GunTimer, NUM_WORLD_DECORATIONS, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, PlayerState};
+use crate::lib::{AnimationTimer, BULLET_SPAWN_INTERVAL, Decoration, GameState, GlobalTextureAtlas, Gun, GunTimer, NUM_WORLD_DECORATIONS, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, RoleState};
 use bevy::app::{App, Plugin};
 use bevy::math::{Vec3, vec2};
 use bevy::prelude::*;
@@ -32,7 +32,7 @@ fn init_world(
             .with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
         Player,
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-        PlayerState::default()
+        RoleState::default()
     ));
     commands.spawn((
         Sprite {

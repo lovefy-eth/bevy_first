@@ -17,7 +17,7 @@ impl Plugin for CollisionPlugin {
 
 fn check_enemy_bullet_collision(
     mut commands: Commands,
-    mut bullet_query: Query<(&Transform,Entity), With<Bullet>>,
+    bullet_query: Query<(&Transform,Entity), With<Bullet>>,
     mut enemy_query: Query<(&Transform, Entity, &mut Health), (With<Enemy>, Without<Bullet>)>,
 ) {
     for (bullet,bullet_entity) in bullet_query.iter() {

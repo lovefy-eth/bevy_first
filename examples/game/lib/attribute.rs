@@ -23,3 +23,10 @@ impl DerefMut for Health {
         &mut self.0
     }
 }
+
+#[derive(Component,Default)]
+pub enum RoleState {
+    #[default]
+    Idle,
+    Moving
+}
