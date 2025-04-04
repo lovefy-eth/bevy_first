@@ -24,6 +24,7 @@ fn main() {
         .add_plugins(CameraPlugin)
         .add_plugins(EnemyPlugin)
         .add_plugins(AnimationPlugin2)
+        .add_plugins(CollisionPlugin)
         .init_state::<GameState>()
         .insert_resource(ClearColor(Color::srgb_u8(
             BG_COLOR.0, BG_COLOR.1, BG_COLOR.2,

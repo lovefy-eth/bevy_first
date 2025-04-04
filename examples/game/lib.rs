@@ -7,6 +7,8 @@ mod world;
 mod camera;
 mod enemy;
 mod animation;
+mod collision;
+mod attribute;
 
 pub use constants::*;
 pub use state::*;
@@ -17,3 +19,5 @@ pub use world::*;
 pub use camera::*;
 pub use enemy::*;
 pub use animation::*;
+pub use attribute::*;
+pub use collision::*;

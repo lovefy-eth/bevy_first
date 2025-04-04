@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use bevy::time::common_conditions::on_timer;
 use rand::Rng;
 use std::time::Duration;
+use crate::lib::attribute::Health;
 
 #[derive(Component)]
 pub struct Enemy;
@@ -64,6 +65,7 @@ fn spawn_enemies(
                 .with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
             Enemy,
             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+            Health::default(),
         ));
     }
 }

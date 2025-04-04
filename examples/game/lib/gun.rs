@@ -1,10 +1,9 @@
-use crate::lib::{
-    BULLET_SPEED, CurPosition, GameState, GlobalTextureAtlas, Player, SPRITE_SCALE_FACTOR,
-};
+use std::time::Instant;
+use crate::lib::{BULLET_SPEED, CurPosition, GameState, GlobalTextureAtlas, Player, SPRITE_SCALE_FACTOR, BULLET_TIME_SECONDS};
 use bevy::app::{App, Update};
 use bevy::input::ButtonInput;
 use bevy::math::{Quat, Vec3, vec3};
-use bevy::prelude::{Commands, Component, IntoSystemConfigs, MouseButton, Plugin, Query, Res, Sprite, TextureAtlas, Time, Transform, Vec2Swizzles, Vec3Swizzles, With, Without, default, in_state, Timer};
+use bevy::prelude::{Commands, Component, IntoSystemConfigs, MouseButton, Plugin, Query, Res, Sprite, TextureAtlas, Time, Transform, Vec2Swizzles, Vec3Swizzles, With, Without, default, in_state, Timer, Entity};
 
 #[derive(Component)]
 pub struct Gun;
@@ -17,6 +16,8 @@ pub struct Bullet;
 pub struct BulletDirection(Vec3);
 #[derive(Component)]
 pub struct Decoration;
+#[derive(Component)]
+struct SpawnInstant(Instant);
 pub struct GunPlugin;
 
 impl Plugin for GunPlugin {
@@ -54,6 +55,7 @@ fn update_gun_input(
             Transform::from_translation(gun_pos).with_scale(Vec3::splat(SPRITE_SCALE_FACTOR)),
             Bullet,
             BulletDirection(*gun_transform.local_y()),
+            SpawnInstant(Instant::now()),
         ));
     }
 }
@@ -80,11 +82,18 @@ fn update_gun_transform(
     let offset = 60.0;
     gun_transform.translation = player_pos + vec3(offset * angle.cos(), offset * angle.sin(), 0.0);
 }
-fn update_bullet(mut bullet_query: Query<(&mut Transform, &Bullet, &BulletDirection)>) {
+fn update_bullet(
+    mut commands: Commands,
+    mut bullet_query: Query<(&mut Transform, &Bullet, &BulletDirection,&SpawnInstant,Entity)>) {
     if bullet_query.is_empty() {
         return;
     }
-    for (mut transform, _, direction) in bullet_query.iter_mut() {
-        transform.translation += direction.0.normalize() * BULLET_SPEED;
+    for (mut transform, _, direction,instant,entity) in bullet_query.iter_mut() {
+        if instant.0.elapsed().as_secs_f32() > BULLET_TIME_SECONDS { // 子弹经过多久消失
+            commands.entity(entity).despawn();
+        } else {
+            transform.translation += direction.0.normalize() * BULLET_SPEED;
+        }
     }
 }
+
