@@ -53,7 +53,7 @@ fn update_gun_input(
     if gun_time.0.tick(time.delta()).finished() {
         let gun_pos = gun_transform.translation;
         let bullet_dir = gun_transform.local_y();
-        let mut rng = rand::rng();
+        //let mut rng = rand::rng();
         let angle = (PI*2.0)/BULLET_PER_SHOT_NUM as f32;
         for i in 0..BULLET_PER_SHOT_NUM {
             let div = Vec3 {

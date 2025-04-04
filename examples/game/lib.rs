@@ -9,6 +9,7 @@ mod enemy;
 mod animation;
 mod collision;
 mod attribute;
+mod gui;
 
 pub use constants::*;
 pub use state::*;
@@ -21,3 +22,4 @@ pub use enemy::*;
 pub use animation::*;
 pub use attribute::*;
 pub use collision::*;
+pub use gui::*;

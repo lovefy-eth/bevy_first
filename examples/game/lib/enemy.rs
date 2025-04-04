@@ -1,8 +1,5 @@
 use crate::lib::attribute::Health;
-use crate::lib::{
-    AnimationTimer, ENEMY_SPAWN_INTERCAL, ENEMY_SPEED, GameState, GlobalTextureAtlas, MAX_ENEMIES,
-    NUM_ENEMIES, Player, RoleState, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W,
-};
+use crate::lib::{AnimationTimer, ENEMY_SPAWN_INTERCAL, ENEMY_SPEED, GameState, GlobalTextureAtlas, MAX_ENEMIES, NUM_ENEMIES, Player, RoleState, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, FOLLOW_DISTANCE};
 use bevy::app::{App, Update};
 use bevy::math::{Vec3, vec2};
 use bevy::prelude::*;
@@ -35,7 +32,7 @@ fn update_enemy_transform(
         return;
     };
     for (mut enemy, mut state) in enemy_query.iter_mut() {
-        if player.translation.distance(enemy.translation).abs() < 500.0 {
+        if player.translation.distance(enemy.translation).abs() < FOLLOW_DISTANCE {
             let dir = (player.translation - enemy.translation).normalize();
             enemy.translation += dir * ENEMY_SPEED;
             *state = RoleState::Moving;

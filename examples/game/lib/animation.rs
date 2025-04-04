@@ -38,8 +38,6 @@ fn update_enemy_animation(
                     }
                 };
             }
-
-
         }
     }
 }

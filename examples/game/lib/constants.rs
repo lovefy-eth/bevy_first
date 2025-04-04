@@ -28,7 +28,8 @@ pub const BG_COLOR: (u8, u8, u8) = (192, 204, 184);
 pub const CAMERA_DECAY_RATE: f32 = 2.;
 
 // Enemy
-pub const NUM_ENEMIES: usize = 1;
+pub const NUM_ENEMIES: usize = 500;
 pub const ENEMY_SPAWN_INTERCAL:f32 = 1.;
 pub const MAX_ENEMIES: usize = 100_000;
 pub const ENEMY_SPEED:f32 = 2.;
+pub const FOLLOW_DISTANCE:f32 = 100_000.;
