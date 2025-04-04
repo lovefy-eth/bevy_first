@@ -1,11 +1,15 @@
-use crate::lib::{ENEMY_SPAWN_INTERCAL, GameState, GlobalTextureAtlas, MAX_ENEMIES, NUM_ENEMIES, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W, ENEMY_SPEED, AnimationTimer};
+use crate::lib::attribute::Health;
+use crate::lib::{
+    AnimationTimer, ENEMY_SPAWN_INTERCAL, ENEMY_SPEED, GameState, GlobalTextureAtlas, MAX_ENEMIES,
+    NUM_ENEMIES, Player, SPRITE_SCALE_FACTOR, WORLD_H, WORLD_W,
+};
 use bevy::app::{App, Update};
 use bevy::math::{Vec3, vec2};
 use bevy::prelude::*;
 use bevy::time::common_conditions::on_timer;
 use rand::Rng;
+use std::f32::consts::PI;
 use std::time::Duration;
-use crate::lib::attribute::Health;
 
 #[derive(Component)]
 pub struct Enemy;
@@ -25,22 +29,20 @@ impl Plugin for EnemyPlugin {
 }
 fn update_enemy_transform(
     player: Query<&Transform, With<Player>>,
-    mut enemy_query:Query<&mut Transform,(With<Enemy>,Without<Player>)>,
-
+    mut enemy_query: Query<&mut Transform, (With<Enemy>, Without<Player>)>,
 ) {
     let Ok(player) = player.get_single() else {
         return;
     };
     for mut enemy in enemy_query.iter_mut() {
-        let dir = (player.translation-enemy.translation).normalize();
-        enemy.translation+=dir*ENEMY_SPEED;
+        let dir = (player.translation - enemy.translation).normalize();
+        enemy.translation += dir * ENEMY_SPEED;
     }
-
-
 }
 fn spawn_enemies(
     mut commands: Commands,
     handle: Res<GlobalTextureAtlas>,
+    player_query:Query<&Transform,With<Player>>,
     enemy_query: Query<&Transform, (With<Enemy>, Without<Player>)>,
 ) {
     let num_enemies = enemy_query.iter().len();
@@ -48,10 +50,14 @@ fn spawn_enemies(
         return;
     }
     let spawn_count = (MAX_ENEMIES - num_enemies).min(NUM_ENEMIES);
-    let mut rng = rand::rng();
+    //let mut rng = rand::rng();
+    let player_transform = player_query.single();
     for _ in 0..spawn_count {
-        let x = rng.random_range(-WORLD_W..WORLD_W);
-        let y = rng.random_range(-WORLD_H..WORLD_H);
+        // let mut x = rng.random_range(-WORLD_W..WORLD_W);
+        // let mut y = rng.random_range(-WORLD_H..WORLD_H);
+
+        // 在玩家附近生成怪物
+        let (x,y) = get_random_position_around(player_transform.translation.truncate());
         commands.spawn((
             Sprite {
                 image: handle.image.clone().unwrap(),
@@ -68,4 +74,14 @@ fn spawn_enemies(
             Health::default(),
         ));
     }
+}
+
+fn get_random_position_around(pos: Vec2) -> (f32, f32) {
+    let mut rng = rand::rng();
+    let angle = rng.gen_range(0.0..PI * 2.0);
+    let distance = rng.gen_range(500.0..2000.0);
+    (
+        pos.x + angle.sin() * distance,
+        pos.y + angle.cos() * distance,
+    )
 }
